@@ -14,8 +14,9 @@ def contact_view(request, *args, **kwargs):
 def about_view(request, *args, **kwargs):
  	my_context = {
  		"my_text" : "This is a text",
+ 		"this_is_true" : True,
  		"my_number" : 123,
- 		"my_list" : [1, 2, 3 ,4]
+ 		"my_list" : [1, 2, 3 ,4, "Abc"]
 
  	}
  	return render(request, "about.html", my_context)
