@@ -20,11 +20,11 @@ from profiles.views import profile_detail_view
 from document.views import editor, delete_document
 
 urlpatterns = [
-    path('', editor, name='editor'),
+    path('api/', include('api.urls')),
     path('delete_document/<int:docid>/', delete_document, name='delete_document'),
     path('about/', about_view),
     path('profile/', profile_detail_view),
     path('contact/', contact_view),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('', include('frontend.urls')),
 ]

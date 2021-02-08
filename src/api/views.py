@@ -22,7 +22,7 @@ def apiOverview(request):
 
 @api_view(['GET'])
 def noteList(request):
-    notes = Note.objects.all()
+    notes = Note.objects.all().order_by('-id')
     serializer = NoteSerializer(notes, many=True)
     return Response(serializer.data)
 

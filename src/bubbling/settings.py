@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'profiles',
     'document',
     'api.apps.ApiConfig',
+    'frontend.apps.FrontendConfig',
 
 ]
 
