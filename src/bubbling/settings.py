@@ -25,8 +25,8 @@ SECRET_KEY = 'd#zz!re=%_de0o%#0ute)=*o0)*6rwf%mw-d#b_!7$zst^%4=+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -38,12 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    
-    #### My Own ####
-
-    'pages',
-    'profiles',
-    'document',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'djoser',
+    'authapp',
     'api.apps.ApiConfig',
     'frontend.apps.FrontendConfig',
 
@@ -57,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'bubbling.urls'
@@ -90,6 +89,27 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSIONS_CLASSES' : (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+AUTH_USER_MODEL = 'authapp.User'
+
+DJOSER = {
+    'LOGIN_FIELD' : 'email',
+    'USER_CREATE_PASSWORD_RETYPE' : True, 
+    'SERIALIZERS' : {
+        'user_create' : 'authapp.serializers.UserCreateSerializer',
+        'user' : 'authapp.serializers.UserCreateSerializer',
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

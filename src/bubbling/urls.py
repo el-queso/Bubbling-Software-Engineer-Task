@@ -15,16 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from pages.views import home_view, contact_view, about_view
-from profiles.views import profile_detail_view
-from document.views import editor, delete_document
+from .views import index
 
 urlpatterns = [
     path('api/', include('api.urls')),
-    path('delete_document/<int:docid>/', delete_document, name='delete_document'),
-    path('about/', about_view),
-    path('profile/', profile_detail_view),
-    path('contact/', contact_view),
     path('admin/', admin.site.urls),
-    path('', include('frontend.urls')),
+    path('frontend', include('frontend.urls')),
+    path('checkserver', index, name='index'),
+    path('auth/', include('authapp.urls')),
 ]

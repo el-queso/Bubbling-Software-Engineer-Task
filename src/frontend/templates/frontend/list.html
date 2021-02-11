@@ -4,7 +4,6 @@
     <title>Bubbling Notes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
-
     <style type="text/css">
         body {
             background : rgb(54,217,182);
@@ -86,6 +85,7 @@
 	</div>
     
     <script type="text/javascript">
+        
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -102,8 +102,9 @@
             return cookieValue;
         }
         const csrftoken = getCookie('csrftoken');
-
         var activeItem = null
+        var list_snapshot = [] 
+
         buildList();
 
         function buildList(){
@@ -117,6 +118,15 @@
                 console.log('Data: ', data)
                 var list = data
                 for (var i in list){
+                    try {
+                        document.getElementById(`data-row-${i}`).remove()
+                    }catch(err){
+
+                    }
+                    var  title = `<span class="title">${list[i].title}</span>`
+                    if (list[i].completed == true){
+                        title = `<strike class="title">${list[i].title}</strike>`
+                    }
                     var item = `
                         <div id="data-row-${i}" class="note-wrapper flex-wrapper">
                             <div style="flex:7">
@@ -133,11 +143,33 @@
                     wrapper.innerHTML += item
                 }
 
+                if (list_snapshot.length > list.length){
+                    for (var i = list.length; i < list_snapshot.length; i++){
+                        document.getElementById(`data-row-${i}`).remove()
+                    }
+                }
+                list_snapshot = list
+
                 for (var i in list){
                     var editBtn = document.getElementsByClassName('edit')[i]
+                    var delteBtn = document.getElementsByClassName('delete')[i]
+                    var title = document.getElementsByClassName('title')[i]
+                    
                     editBtn.addEventListener('click', (function(item){
                         return function(){
                             editItem(item)
+                        }
+                    })(list[i]))
+                    
+                    delteBtn.addEventListener('click', (function(item){
+                        return function(){
+                            deleteItem(item)
+                        }
+                    })(list[i]))
+
+                    title.addEventListener('click', (function(item){
+                        return function(){
+                            strikeUnstrike(item)
                         }
                     })(list[i]))
                 }
@@ -149,13 +181,17 @@
             e.preventDefault()
             console.log('Form submited')
             var createUrl = 'http://localhost:8000/api/note-create/'
+            if (activeItem != null){
+                var createUrl = `http://127.0.0.1:8000/api/note-create/${activeItem.id}/`
+                activeItem = null
+            }
             var title = document.getElementById('title').value
             
             fetch(createUrl, {
                 method : 'POST',
                 headers : {
-                    'X-CSRFToken': csrftoken,
                     'Content-type' : 'application/json',
+                    'X-CSRFToken': csrftoken,  
                 },
                 body : JSON.stringify({'title':title})
             }
@@ -170,6 +206,34 @@
             activeItem = item
             document.getElementById('title').value = activeItem.title
         }
+
+        function deleteItem(item){
+			console.log('Delete clicked')
+			fetch(`http://127.0.0.1:8000/api/note-delete/${item.id}/`, {
+				method:'DELETE', 
+				headers:{
+					'Content-type':'application/json',
+					'X-CSRFToken':csrftoken,
+				}
+			}).then((response) => {
+				buildList()
+			})
+		}
+        function strikeUnstrike(item){
+			console.log('Strike clicked')
+			item.completed = !item.completed
+			fetch(`http://127.0.0.1:8000/api/note-update/${item.id}/`, {
+				method:'POST', 
+				headers:{
+					'Content-type':'application/json',
+					'X-CSRFToken':csrftoken,
+				},
+				body:JSON.stringify({'title':item.title, 'completed':item.completed})
+			}).then((response) => {
+				buildList()
+			})
+		}
+
     </script>
 </body>
 </html>
